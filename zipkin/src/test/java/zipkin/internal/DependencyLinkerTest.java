@@ -42,15 +42,12 @@ public class DependencyLinkerTest {
 
   /** This ensures a NPE isn't raised when children point to themselves as a parent. */
   @Test
-  public void allocatesSelfReferencingSpansToRoot() {
+  public void dropsSelfReferencingSpans() {
     List<Span> trace = TestObjects.TRACE.stream()
       .map(s -> s.toBuilder().parentId(s.parentId != null ? s.id : null).build())
       .collect(Collectors.toList());
 
-    assertThat(new DependencyLinker().putTrace(trace).link()).containsExactly(
-      DependencyLink.create("web", "app", 1L),
-      DependencyLink.create("app", "db", 1L)
-    );
+    assertThat(new DependencyLinker().putTrace(trace).link()).isEmpty();
   }
 
   /**

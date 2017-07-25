@@ -132,6 +132,8 @@ public final class Node<V> {
     Map<Long, Long> idToParent = new LinkedHashMap<>(idToNode.size());
 
     public void addNode(@Nullable Long parentId, long id, V value) {
+      // drop circular deps vs NPE later
+      if (parentId != null && parentId.equals(id)) return;
       Node<V> node = new Node<V>().value(value);
       // special-case root, and attribute missing parents to it. In
       // other words, assume that the first root is the "real" root.
@@ -149,7 +151,7 @@ public final class Node<V> {
       for (Map.Entry<Long, Long> entry : idToParent.entrySet()) {
         Node<V> node = idToNode.get(entry.getKey());
         Node<V> parent = idToNode.get(entry.getValue());
-        if (parent == null || node == parent) { // handle headless or circular dep span
+        if (parent == null) { // handle headless
           if (rootNode == null) {
             rootNode = new Node<>();
             rootNode.missingRootDummyNode = true;

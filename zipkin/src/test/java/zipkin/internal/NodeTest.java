@@ -109,7 +109,7 @@ public class NodeTest {
     assertThat(treeSize).isEqualTo(spans.size());
   }
 
-  @Test public void constructTree_selfReferencingChildrenGoToRoot() {
+  @Test public void constructTree_selfReferencingChildrenAreDropped() {
     Span s1 = Span.builder().traceId(137L).id(1L).name("s1").build();
     Span s2 = Span.builder().traceId(137L).parentId(1L).id(2L).name("s2").build();
     Span s3 = Span.builder().traceId(137L).parentId(3L).id(3L).name("s3").build();
@@ -119,10 +119,10 @@ public class NodeTest {
     assertThat(root.value())
       .isEqualTo(s1);
     assertThat(root.children()).extracting(Node::value)
-      .containsExactly(s2, s3, s4);
+      .containsExactly(s2);
   }
 
-  @Test public void constructTree_selfReferencingChildrenGoToRoot_headless() {
+  @Test public void constructTree_selfReferencingChildrenAreDropped_headless() {
     Span s2 = Span.builder().traceId(137L).parentId(1L).id(2L).name("s2").build();
     Span s3 = Span.builder().traceId(137L).parentId(3L).id(3L).name("s3").build();
     Span s4 = Span.builder().traceId(137L).parentId(4L).id(4L).name("s4").build();
@@ -131,6 +131,6 @@ public class NodeTest {
     assertThat(root.isSyntheticRootForPartialTree())
       .isTrue();
     assertThat(root.children()).extracting(Node::value)
-      .containsExactly(s2, s3, s4);
+      .containsExactly(s2);
   }
 }
